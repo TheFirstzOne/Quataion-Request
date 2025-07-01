@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบขอใบเสนอราคา - บริษัท อิมมอทัล พาร์ท จำกัด</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #f0f4f8; /* Light blue-gray background */
+        }
+        .container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .form-section {
+            border: 1px solid #e2e8f0; /* Light gray border */
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            background-color: #f9fafb; /* Slightly off-white for sections */
+        }
+        .form-section h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1e3a8a; /* Dark blue */
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #3b82f6; /* Medium blue accent */
+            padding-bottom: 0.5rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #374151; /* Dark gray */
+        }
+        input[type="text"],
+        input[type="number"],
+        input[type="file"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db; /* Gray border */
+            border-radius: 6px;
+            transition: border-color 0.2s;
+            font-size: 0.95rem;
+        }
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="file"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #3b82f6; /* Medium blue on focus */
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 0.95rem;
+        }
+        .btn-primary {
+            background-color: #2563eb; /* Blue */
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #1d4ed8; /* Darker blue */
+        }
+        .btn-secondary {
+            background-color: #6b7280; /* Gray */
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #4b5563; /* Darker gray */
+        }
+        .btn-danger {
+            background-color: #dc2626; /* Red */
+            color: white;
+        }
+        .btn-danger:hover {
+            background-color: #b91c1c; /* Darker red */
+        }
+        .btn-success {
+            background-color: #16a34a; /* Green */
+            color: white;
+        }
+        .btn-success:hover {
+            background-color: #15803d; /* Darker green */
+        }
+        .equipment-item {
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-end; /* Align button with bottom of inputs */
+            margin-bottom: 0.75rem;
+            padding: 0.75rem;
+            border: 1px dashed #cbd5e1;
+            border-radius: 6px;
+            background-color: #fff;
+        }
+        .equipment-item > div {
+            flex-grow: 1;
+        }
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .equipment-item {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .equipment-item > div, .equipment-item button {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+            .equipment-item button {
+                margin-top: 0.5rem;
+            }
+            .container {
+                margin: 1rem;
+                padding: 1rem;
+            }
+            .form-section h2 {
+                font-size: 1.25rem;
+            }
+        }
+        #currentDateTime {
+            font-size: 0.9rem;
+            color: #4b5563; /* Medium gray */
+            text-align: right;
+            margin-bottom: 1rem;
+        }
+        .custom-logo-img {
+            width: 220px;
+            height: 120px;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="text-center mb-8">
+            <img src="https://github.com/TheFirstzOne/file-storage/raw/main/ChatGPT%20Image%2029%20%E0%B8%9E.%E0%B8%84.%202568%2013_37_43.png" alt="บริษัท อิมมอทัล พาร์ท จำกัด" class="custom-logo-img mx-auto mb-4">
+            <h1 class="text-3xl font-bold text-[#1e3a8a]">ระบบขอใบเสนอราคา</h1>
+            <p class="text-md text-gray-600">บริษัท อิมมอทัล พาร์ท จำกัด</p>
+        </div>
+
+        <div id="currentDateTime"></div>
+
+        <form id="quotationForm">
+            <div class="form-section">
+                <h2>1. ข้อมูลผู้ขอ</h2>
+                <div>
+                    <label for="requesterName">ชื่อผู้ขอ (Requester Name):</label>
+                    <input type="text" id="requesterName" name="requesterName" required>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>2. รายการอุปกรณ์</h2>
+                <div id="equipmentList">
+                    </div>
+                <button type="button" id="addEquipment" class="btn btn-success mt-2 text-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                    </svg>
+                    เพิ่มรายการอุปกรณ์
+                </button>
+            </div>
+
+            <div class="form-section">
+                <h2>3. รายละเอียดเพิ่มเติม</h2>
+                <div>
+                    <label for="additionalDetails">รายละเอียดเพิ่มเติม:</label>
+                    <textarea id="additionalDetails" name="additionalDetails" rows="4"></textarea>
+                </div>
+                <div class="mt-4">
+                    <label for="fileAttachment">ไฟล์แนบ (ถ้ามี):</label>
+                    <input type="file" id="fileAttachment" name="fileAttachment">
+                    <p class="text-xs text-gray-500 mt-1">ระบบจะบันทึกเพียงชื่อไฟล์เท่านั้น กรุณาส่งไฟล์จริงแยกต่างหากหากจำเป็น</p>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>4. หมายเหตุ</h2>
+                <div>
+                    <label for="notes">หมายเหตุเพิ่มเติม (Optional):</label>
+                    <textarea id="notes" name="notes" rows="3"></textarea>
+                </div>
+            </div>
+
+            <div class="mt-8 flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3">
+                <button type="button" id="resetBtn" class="btn btn-secondary">
+                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    ล้างข้อมูล
+                </button>
+                <button type="submit" id="submitBtn" class="btn btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 16.571V11.5a1 1 0 011-1h.094a1 1 0 01.866.517l1.586 3.172a1 1 0 001.756-.043l1.586-3.172a1 1 0 01.866-.517H16.5a1 1 0 011 1v.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                    </svg>
+                    ส่งคำขอใบเสนอราคา
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // --- Date and Time ---
+        function updateDateTime() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            document.getElementById('currentDateTime').textContent = 'วันที่และเวลาปัจจุบัน: ' + now.toLocaleDateString('th-TH', options);
+        }
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
+        // --- Equipment List Management ---
+        const equipmentListDiv = document.getElementById('equipmentList');
+        const addEquipmentBtn = document.getElementById('addEquipment');
+        let equipmentCounter = 0;
+
+        function addEquipmentItem() {
+            equipmentCounter++;
+            const newItem = document.createElement('div');
+            newItem.classList.add('equipment-item');
+            newItem.id = `equipment-${equipmentCounter}`;
+            newItem.innerHTML = `
+                <div class="flex-1">
+                    <label for="equipmentName-${equipmentCounter}" class="text-sm">ชื่ออุปกรณ์:</label>
+                    <input type="text" id="equipmentName-${equipmentCounter}" name="equipmentName" class="equipment-name" placeholder="เช่น ปั๊มน้ำ" required>
+                </div>
+                <div style="flex-basis: 120px;">
+                    <label for="quantity-${equipmentCounter}" class="text-sm">จำนวน:</label>
+                    <input type="number" id="quantity-${equipmentCounter}" name="quantity" class="equipment-quantity" placeholder="เช่น 1" min="1" required>
+                </div>
+                <div style="flex-basis: 150px;">
+                    <label for="unit-${equipmentCounter}" class="text-sm">หน่วย:</label>
+                    <select id="unit-${equipmentCounter}" name="unit" class="equipment-unit" required>
+                        <option value="">เลือกหน่วย</option>
+                        <option value="ชิ้น">ชิ้น</option>
+                        <option value="ตัว">ตัว</option>
+                        <option value="ชุด">ชุด</option>
+                        <option value="เครื่อง">เครื่อง</option>
+                        <option value="อัน">อัน</option>
+                        <option value="เส้น">เส้น</option>
+                        <option value="เมตร">เมตร</option>
+                        <option value="กิโลกรัม">กิโลกรัม</option>
+                        <option value="ลิตร">ลิตร</option>
+                        <option value="กล่อง">กล่อง</option>
+                        <option value="อื่นๆ">อื่นๆ (ระบุ)</option>
+                    </select>
+                     <input type="text" id="unitOther-${equipmentCounter}" name="unitOther" class="equipment-unit-other mt-1 hidden" placeholder="ระบุหน่วยอื่น">
+                </div>
+                <button type="button" class="btn btn-danger btn-sm remove-equipment" data-id="${equipmentCounter}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            `;
+            equipmentListDiv.appendChild(newItem);
+            
+            // Event listener for 'อื่นๆ' in unit selection
+            const unitSelect = newItem.querySelector(`#unit-${equipmentCounter}`);
+            const unitOtherInput = newItem.querySelector(`#unitOther-${equipmentCounter}`);
+            unitSelect.addEventListener('change', function() {
+                if (this.value === 'อื่นๆ') {
+                    unitOtherInput.classList.remove('hidden');
+                    unitOtherInput.required = true;
+                } else {
+                    unitOtherInput.classList.add('hidden');
+                    unitOtherInput.required = false;
+                    unitOtherInput.value = '';
+                }
+            });
+        }
+
+        addEquipmentBtn.addEventListener('click', addEquipmentItem);
+
+        equipmentListDiv.addEventListener('click', function(e) {
+            if (e.target.closest('.remove-equipment')) {
+                const button = e.target.closest('.remove-equipment');
+                const itemId = button.dataset.id;
+                document.getElementById(`equipment-${itemId}`).remove();
+            }
+        });
+
+        // Add one equipment item by default
+        addEquipmentItem();
+
+        // --- Form Submission ---
+        const form = document.getElementById('quotationForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // Basic validation for at least one equipment item
+            const equipmentItems = document.querySelectorAll('.equipment-item');
+            if (equipmentItems.length === 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'ข้อมูลไม่ครบถ้วน',
+                    text: 'กรุณาเพิ่มรายการอุปกรณ์อย่างน้อย 1 รายการ',
+                    confirmButtonColor: '#3b82f6'
+                });
+                return;
+            }
+            
+            // Validate all required fields in equipment items
+            let allEquipmentValid = true;
+            equipmentItems.forEach((item, index) => {
+                const name = item.querySelector('.equipment-name').value.trim();
+                const quantity = item.querySelector('.equipment-quantity').value.trim();
+                const unit = item.querySelector('.equipment-unit').value;
+                const unitOther = item.querySelector('.equipment-unit-other');
+
+                if (!name || !quantity || !unit || (unit === 'อื่นๆ' && !unitOther.value.trim())) {
+                    allEquipmentValid = false;
+                    // Highlight missing fields
+                    if(!name) item.querySelector('.equipment-name').style.borderColor = 'red'; else item.querySelector('.equipment-name').style.borderColor = '';
+                    if(!quantity) item.querySelector('.equipment-quantity').style.borderColor = 'red'; else item.querySelector('.equipment-quantity').style.borderColor = '';
+                    if(!unit) item.querySelector('.equipment-unit').style.borderColor = 'red'; else item.querySelector('.equipment-unit').style.borderColor = '';
+                    if(unit === 'อื่นๆ' && !unitOther.value.trim()) unitOther.style.borderColor = 'red'; else unitOther.style.borderColor = '';
+
+                } else {
+                     item.querySelector('.equipment-name').style.borderColor = '';
+                     item.querySelector('.equipment-quantity').style.borderColor = '';
+                     item.querySelector('.equipment-unit').style.borderColor = '';
+                     if(unitOther) unitOther.style.borderColor = '';
+                }
+            });
+
+            if (!allEquipmentValid) {
+                 Swal.fire({
+                    icon: 'error',
+                    title: 'ข้อมูลอุปกรณ์ไม่ครบถ้วน',
+                    text: 'กรุณากรอกข้อมูลอุปกรณ์ให้ครบทุกช่องในแต่ละรายการ',
+                    confirmButtonColor: '#3b82f6'
+                });
+                return;
+            }
+
+
+            Swal.fire({
+                title: 'ยืนยันการส่งข้อมูล?',
+                text: "คุณต้องการส่งคำขอใบเสนอราคานี้ใช่หรือไม่?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#2563eb',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'ใช่, ส่งเลย!',
+                cancelButtonText: 'ยกเลิก'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    submitData();
+                }
+            });
+        });
+
+        function submitData() {
+            Swal.fire({
+                title: 'กำลังส่งข้อมูล...',
+                text: 'กรุณารอสักครู่',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Check if google.script.run is available
+            if (typeof google === 'undefined' || typeof google.script === 'undefined' || typeof google.script.run === 'undefined') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'ข้อผิดพลาดในการเชื่อมต่อ',
+                    html: 'ไม่สามารถเรียกใช้งาน Google Apps Script (<code>google.script.run</code> is not defined).<br>กรุณาตรวจสอบว่าคุณกำลังใช้งานหน้าเว็บนี้ผ่าน URL ที่ถูกต้องจากการ deploy บน Google Apps Script หรือติดต่อผู้พัฒนา',
+                    confirmButtonColor: '#dc2626'
+                });
+                return; // Stop execution if google.script.run is not available
+            }
+
+            const requesterName = document.getElementById('requesterName').value;
+            const additionalDetails = document.getElementById('additionalDetails').value;
+            const fileInput = document.getElementById('fileAttachment');
+            const fileName = fileInput.files.length > 0 ? fileInput.files[0].name : "";
+            const notes = document.getElementById('notes').value;
+
+            const equipmentData = [];
+            document.querySelectorAll('.equipment-item').forEach(item => {
+                const name = item.querySelector('.equipment-name').value;
+                const quantity = item.querySelector('.equipment-quantity').value;
+                let unit = item.querySelector('.equipment-unit').value;
+                const unitOther = item.querySelector('.equipment-unit-other').value.trim();
+                if (unit === 'อื่นๆ' && unitOther) {
+                    unit = unitOther;
+                }
+                equipmentData.push({ name, quantity, unit });
+            });
+
+            const formData = {
+                timestamp: new Date().toISOString(),
+                requesterName,
+                equipmentList: JSON.stringify(equipmentData), // Send as JSON string
+                additionalDetails,
+                fileAttachmentName: fileName, // Sending only the name
+                notes
+            };
+            
+            // console.log("Data to send:", formData); // For debugging
+
+            google.script.run
+                .withSuccessHandler(response => {
+                    Swal.close(); // Close the loading Swal first
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'ส่งข้อมูลสำเร็จ!',
+                            text: 'คำขอใบเสนอราคาของคุณถูกส่งเรียบร้อยแล้ว',
+                            confirmButtonColor: '#16a34a'
+                        });
+                        form.reset(); // Reset form fields
+                        equipmentListDiv.innerHTML = ''; // Clear dynamic equipment items
+                        addEquipmentItem(); // Add one default item back
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'เกิดข้อผิดพลาด!',
+                            text: 'ไม่สามารถส่งข้อมูลได้: ' + (response.error || 'Unknown error from server'),
+                            confirmButtonColor: '#dc2626'
+                        });
+                    }
+                })
+                .withFailureHandler(error => {
+                    Swal.close(); // Close the loading Swal first
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'เกิดข้อผิดพลาดร้ายแรง!',
+                        text: 'ไม่สามารถติดต่อกับเซิร์ฟเวอร์ได้: ' + error.message,
+                        confirmButtonColor: '#dc2626'
+                    });
+                    console.error("Google Script Run Error:", error);
+                })
+                .submitQuotationRequest(formData);
+        }
+
+        resetBtn.addEventListener('click', () => {
+            Swal.fire({
+                title: 'ล้างข้อมูลในฟอร์ม?',
+                text: "คุณต้องการล้างข้อมูลทั้งหมดในฟอร์มนี้ใช่หรือไม่?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'ใช่, ล้างข้อมูล!',
+                cancelButtonText: 'ยกเลิก'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.reset();
+                    equipmentListDiv.innerHTML = ''; // Clear dynamic items
+                    addEquipmentItem(); // Add one default item back
+                    // Clear any validation highlights
+                    document.querySelectorAll('input, select, textarea').forEach(el => el.style.borderColor = '');
+                    Swal.fire({
+                       icon: 'info',
+                       title: 'ล้างข้อมูลแล้ว',
+                       text: 'ข้อมูลในฟอร์มถูกล้างเรียบร้อยแล้ว',
+                       timer: 1500,
+                       showConfirmButton: false
+                    });
+                }
+            });
+        });
+
+    </script>
+</body>
+</html>
