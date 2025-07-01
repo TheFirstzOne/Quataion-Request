@@ -98,6 +98,23 @@
         .btn-success:hover {
             background-color: #15803d; /* Darker green */
         }
+        /* Style for "View Data" button */
+        .btn-info {
+            background-color: #3abff8; /* Light blue */
+            color: white;
+        }
+        .btn-info:hover {
+            background-color: #03a0e7; /* Darker light blue */
+        }
+        /* Style for "View History" button */
+        .btn-history {
+            background-color: #65a30d; /* Olive green */
+            color: white;
+        }
+        .btn-history:hover {
+            background-color: #4d7c0f; /* Darker olive green */
+        }
+
         .equipment-item {
             display: flex;
             gap: 0.75rem;
@@ -143,14 +160,6 @@
             height: 120px;
             object-fit: cover;
         }
-        // ในส่วนของ <style> เพิ่ม class สำหรับปุ่มสีฟ้าอ่อน
-        .btn-info {
-            background-color: #3abff8; /* Light blue */
-            color: white;
-        }
-        .btn-info:hover {
-            background-color: #03a0e7; /* Darker light blue */
-        }
     </style>
 </head>
 <body>
@@ -175,7 +184,7 @@
             <div class="form-section">
                 <h2>2. รายการอุปกรณ์</h2>
                 <div id="equipmentList">
-                    </div>
+                </div>
                 <button type="button" id="addEquipment" class="btn btn-success mt-2 text-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
@@ -206,6 +215,14 @@
             </div>
 
             <div class="mt-8 flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3">
+                <button type="button" id="viewHistoryBtn" class="btn btn-history">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2-1.343-2-3-2z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    ดูประวัติ
+                </button>
                 <button type="button" id="viewDataBtn" class="btn btn-info">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -214,16 +231,16 @@
                     ดูข้อมูล
                 </button>
                 <button type="button" id="resetBtn" class="btn btn-secondary">
-                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
                     ล้างข้อมูล
                 </button>
                 <button type="submit" id="submitBtn" class="btn btn-primary">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" viewBox="0 0 20 20" fill="currentColor">
-                      <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 16.571V11.5a1 1 0 011-1h.094a1 1 0 01.866.517l1.586 3.172a1 1 0 001.756-.043l1.586-3.172a1 1 0 01.866-.517H16.5a1 1 0 011 1v.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
-                  </svg>
-                  ส่งคำขอใบเสนอราคา
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 16.571V11.5a1 1 0 011-1h.094a1 1 0 01.866.517l1.586 3.172a1 1 0 001.756-.043l1.586-3.172a1 1 0 01.866-.517H16.5a1 1 0 011 1v.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                    </svg>
+                    ส่งคำขอใบเสนอราคา
                 </button>
             </div>
         </form>
@@ -274,7 +291,7 @@
                         <option value="กล่อง">กล่อง</option>
                         <option value="อื่นๆ">อื่นๆ (ระบุ)</option>
                     </select>
-                     <input type="text" id="unitOther-${equipmentCounter}" name="unitOther" class="equipment-unit-other mt-1 hidden" placeholder="ระบุหน่วยอื่น">
+                    <input type="text" id="unitOther-${equipmentCounter}" name="unitOther" class="equipment-unit-other mt-1 hidden" placeholder="ระบุหน่วยอื่น">
                 </div>
                 <button type="button" class="btn btn-danger btn-sm remove-equipment" data-id="${equipmentCounter}">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block" viewBox="0 0 20 20" fill="currentColor">
@@ -316,6 +333,9 @@
         const form = document.getElementById('quotationForm');
         const submitBtn = document.getElementById('submitBtn');
         const resetBtn = document.getElementById('resetBtn');
+        const viewDataBtn = document.getElementById('viewDataBtn'); // Get the new view data button
+        const viewHistoryBtn = document.getElementById('viewHistoryBtn'); // Get the new view history button
+
 
         form.addEventListener('submit', function(event) {
             event.preventDefault();
@@ -346,18 +366,18 @@
                     if(!name) item.querySelector('.equipment-name').style.borderColor = 'red'; else item.querySelector('.equipment-name').style.borderColor = '';
                     if(!quantity) item.querySelector('.equipment-quantity').style.borderColor = 'red'; else item.querySelector('.equipment-quantity').style.borderColor = '';
                     if(!unit) item.querySelector('.equipment-unit').style.borderColor = 'red'; else item.querySelector('.equipment-unit').style.borderColor = '';
-                    if(unit === 'อื่นๆ' && !unitOther.value.trim()) unitOther.style.borderColor = 'red'; else unitOther.style.borderColor = '';
+                    if(unit === 'อื่นๆ' && unitOther) unitOther.style.borderColor = 'red'; else if(unitOther) unitOther.style.borderColor = '';
 
                 } else {
-                     item.querySelector('.equipment-name').style.borderColor = '';
-                     item.querySelector('.equipment-quantity').style.borderColor = '';
-                     item.querySelector('.equipment-unit').style.borderColor = '';
-                     if(unitOther) unitOther.style.borderColor = '';
+                    item.querySelector('.equipment-name').style.borderColor = '';
+                    item.querySelector('.equipment-quantity').style.borderColor = '';
+                    item.querySelector('.equipment-unit').style.borderColor = '';
+                    if(unitOther) unitOther.style.borderColor = '';
                 }
             });
 
             if (!allEquipmentValid) {
-                 Swal.fire({
+                Swal.fire({
                     icon: 'error',
                     title: 'ข้อมูลอุปกรณ์ไม่ครบถ้วน',
                     text: 'กรุณากรอกข้อมูลอุปกรณ์ให้ครบทุกช่องในแต่ละรายการ',
@@ -486,19 +506,17 @@
                     // Clear any validation highlights
                     document.querySelectorAll('input, select, textarea').forEach(el => el.style.borderColor = '');
                     Swal.fire({
-                       icon: 'info',
-                       title: 'ล้างข้อมูลแล้ว',
-                       text: 'ข้อมูลในฟอร์มถูกล้างเรียบร้อยแล้ว',
-                       timer: 1500,
-                       showConfirmButton: false
+                        icon: 'info',
+                        title: 'ล้างข้อมูลแล้ว',
+                        text: 'ข้อมูลในฟอร์มถูกล้างเรียบร้อยแล้ว',
+                        timer: 1500,
+                        showConfirmButton: false
                     });
                 }
             });
         });
 
-        // ในส่วนของ <script>
-        const viewDataBtn = document.getElementById('viewDataBtn');
-
+        // Event listener for "View Data" button
         viewDataBtn.addEventListener('click', () => {
             const requesterName = document.getElementById('requesterName').value;
             const additionalDetails = document.getElementById('additionalDetails').value;
@@ -536,6 +554,20 @@
                 confirmButtonColor: '#3abff8'
             });
         });
+
+        // Event listener for "View History" button
+        viewHistoryBtn.addEventListener('click', () => {
+            // Check if google.script.run is available (for Apps Script deployment)
+            if (typeof google !== 'undefined' && typeof google.script !== 'undefined' && typeof google.script.run !== 'undefined') {
+                google.script.run.withSuccessHandler(url => {
+                    window.open(url, '_blank'); // Open in a new tab/window
+                }).getHistoryPageUrl(); // This function needs to be defined in your Apps Script .gs file
+            } else {
+                // For local testing, just open history.html directly
+                window.open('history.html', '_blank');
+            }
+        });
+
     </script>
 </body>
 </html>
