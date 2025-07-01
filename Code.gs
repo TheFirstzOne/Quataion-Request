@@ -10,11 +10,58 @@ const TELEGRAM_CHAT_IDS = [
   // เพิ่ม Chat ID ได้ตามต้องการ
 ];
 
+
+/**
+ * Handles GET requests to the Web App.
+ * This function determines which HTML page to serve based on URL parameters.
+ * @param {GoogleAppsScript.Events.AppsScriptHttpRequestEvent} e The event object.
+ * @returns {GoogleAppsScript.HTML.HtmlOutput} The HTML page to be served.
+ */
 function doGet(e) {
-  return HtmlService.createHtmlOutputFromFile('index')
+  let page = 'index'; // Default page to serve
+
+  // Check if a 'page' parameter is present in the URL
+  if (e && e.parameter && e.parameter.page) {
+    page = e.parameter.page;
+  }
+
+  let template;
+  try {
+    template = HtmlService.createTemplateFromFile(page);
+  } catch (error) {
+    // If the requested page file does not exist, fall back to index.html
+    console.error(`Error loading template for page ${page}: ${error.message}. Falling back to index.html.`);
+    template = HtmlService.createTemplateFromFile('index');
+  }
+  
+  return template.evaluate()
       .setTitle("ระบบขอใบเสนอราคา - บริษัท อิมมอทัล พาร์ท จำกัด")
-      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+      .addMetaTag('viewport', 'width=device-width, initial-scale=1.0');
 }
+
+/**
+ * Returns the URL for the history page.
+ * This function is called from client-side JavaScript via google.script.run.
+ * @returns {string} The URL to the history.html page.
+ */
+function getHistoryPageUrl() {
+  const url = ScriptApp.getService().getUrl();
+  // Append a parameter to the URL to tell doGet to load history.html
+  return url + '?page=history';
+}
+
+/**
+ * Returns the URL for the main form page (index.html).
+ * This function is called from client-side JavaScript via google.script.run.
+ * @returns {string} The URL to the index.html page.
+ */
+function getIndexPageUrl() {
+  const url = ScriptApp.getService().getUrl();
+  // No parameter needed as index is the default, but can add '?page=index' for clarity if desired.
+  return url;
+}
+
 
 function submitQuotationRequest(formData) {
   try {
@@ -82,7 +129,7 @@ function submitQuotationRequest(formData) {
 function sendTelegramNotification(formData, equipmentListFormatted) {
   try {
     // ตรวจสอบการตั้งค่า Telegram Bot
-    if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === "YOUR_BOT_TOKEN_HERE") {
+    if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === "") { // Changed from "YOUR_BOT_TOKEN_HERE" for robustness
       console.log("Telegram Bot Token not configured. Skipping Telegram notification.");
       return;
     }
@@ -132,7 +179,7 @@ function sendTelegramNotification(formData, equipmentListFormatted) {
       telegramMessage += `<i>${formData.notes}</i>\n`;
     }
 
-    //telegramMessage += `\n💼 <b>บริษัท  อิมมอทัล พาร์ท จำกัด</b>`;
+    //telegramMessage += `\n💼 <b>บริษัท  อิมมอทัล พาร์ท จำกัด</b>`;
 
     // ส่งข้อความไปยัง Chat IDs ทั้งหมด
     TELEGRAM_CHAT_IDS.forEach(chatId => {
@@ -218,7 +265,7 @@ function sendTelegramMessageWithKeyboard(chatId, message, keyboardButtons) {
 // ฟังก์ชันขั้นสูง: ส่งข้อความพร้อมปุ่มตอบกลับด่วน
 function sendAdvancedTelegramNotification(formData, equipmentListFormatted) {
   try {
-    if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === "YOUR_BOT_TOKEN_HERE") {
+    if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === "") { // Changed from "YOUR_BOT_TOKEN_HERE"
       console.log("Telegram Bot Token not configured.");
       return;
     }
@@ -279,7 +326,7 @@ function sendAdvancedTelegramNotification(formData, equipmentListFormatted) {
 // ฟังก์ชันดึง Chat ID ของผู้ใช้ที่ส่งข้อความมาให้ Bot
 function getTelegramUpdates() {
   try {
-    if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === "YOUR_BOT_TOKEN_HERE") {
+    if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === "") { // Changed from "YOUR_BOT_TOKEN_HERE"
       console.log("Telegram Bot Token not configured.");
       return;
     }
