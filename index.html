@@ -143,6 +143,14 @@
             height: 120px;
             object-fit: cover;
         }
+        // ในส่วนของ <style> เพิ่ม class สำหรับปุ่มสีฟ้าอ่อน
+        .btn-info {
+            background-color: #3abff8; /* Light blue */
+            color: white;
+        }
+        .btn-info:hover {
+            background-color: #03a0e7; /* Darker light blue */
+        }
     </style>
 </head>
 <body>
@@ -198,6 +206,13 @@
             </div>
 
             <div class="mt-8 flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3">
+                <button type="button" id="viewDataBtn" class="btn btn-info">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    ดูข้อมูล
+                </button>
                 <button type="button" id="resetBtn" class="btn btn-secondary">
                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -205,10 +220,10 @@
                     ล้างข้อมูล
                 </button>
                 <button type="submit" id="submitBtn" class="btn btn-primary">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 16.571V11.5a1 1 0 011-1h.094a1 1 0 01.866.517l1.586 3.172a1 1 0 001.756-.043l1.586-3.172a1 1 0 01.866-.517H16.5a1 1 0 011 1v.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
-                    </svg>
-                    ส่งคำขอใบเสนอราคา
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 16.571V11.5a1 1 0 011-1h.094a1 1 0 01.866.517l1.586 3.172a1 1 0 001.756-.043l1.586-3.172a1 1 0 01.866-.517H16.5a1 1 0 011 1v.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                  </svg>
+                  ส่งคำขอใบเสนอราคา
                 </button>
             </div>
         </form>
@@ -481,6 +496,46 @@
             });
         });
 
+        // ในส่วนของ <script>
+        const viewDataBtn = document.getElementById('viewDataBtn');
+
+        viewDataBtn.addEventListener('click', () => {
+            const requesterName = document.getElementById('requesterName').value;
+            const additionalDetails = document.getElementById('additionalDetails').value;
+            const fileInput = document.getElementById('fileAttachment');
+            const fileName = fileInput.files.length > 0 ? fileInput.files[0].name : "ไม่มีไฟล์แนบ";
+            const notes = document.getElementById('notes').value;
+
+            const equipmentData = [];
+            document.querySelectorAll('.equipment-item').forEach((item, index) => {
+                const name = item.querySelector('.equipment-name').value;
+                const quantity = item.querySelector('.equipment-quantity').value;
+                let unit = item.querySelector('.equipment-unit').value;
+                const unitOther = item.querySelector('.equipment-unit-other').value.trim();
+                if (unit === 'อื่นๆ' && unitOther) {
+                    unit = unitOther;
+                }
+                equipmentData.push({ name, quantity, unit });
+            });
+
+            let equipmentDisplay = equipmentData.length > 0 ? equipmentData.map(eq => `- ${eq.name} จำนวน: ${eq.quantity} ${eq.unit}`).join('<br>') : 'ไม่มีรายการอุปกรณ์';
+
+            Swal.fire({
+                title: '<h3>ข้อมูลที่กำลังจะส่ง:</h3>',
+                html: `
+                    <div style="text-align: left;">
+                        <p><strong>ชื่อผู้ขอ:</strong> ${requesterName || 'ไม่ได้ระบุ'}</p>
+                        <p><strong>รายการอุปกรณ์:</strong><br>${equipmentDisplay}</p>
+                        <p><strong>รายละเอียดเพิ่มเติม:</strong> ${additionalDetails || 'ไม่ได้ระบุ'}</p>
+                        <p><strong>ไฟล์แนบ:</strong> ${fileName}</p>
+                        <p><strong>หมายเหตุ:</strong> ${notes || 'ไม่ได้ระบุ'}</p>
+                    </div>
+                `,
+                icon: 'info',
+                confirmButtonText: 'ปิด',
+                confirmButtonColor: '#3abff8'
+            });
+        });
     </script>
 </body>
 </html>
