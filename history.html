@@ -49,8 +49,9 @@
             background-color: #f9fafb;
             min-height: 200px; /* Minimum height for content area */
             display: flex;
-            justify-content: center;
-            align-items: center;
+            flex-direction: column; /* Allow content to stack */
+            justify-content: flex-start; /* Align content to start */
+            align-items: center; /* Center horizontally for loading text */
             color: #4b5563;
         }
         .btn {
@@ -79,6 +80,38 @@
             box-sizing: border-box; /* Include padding in width */
             padding-right: 2rem; /* Add some right padding for consistency */
         }
+        
+        /* Table styles */
+        .history-table-container {
+            overflow-x: auto; /* Enable horizontal scrolling on small screens */
+            width: 100%;
+        }
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+        .history-table th,
+        .history-table td {
+            border: 1px solid #cbd5e1;
+            padding: 0.75rem 1rem;
+            text-align: left;
+            vertical-align: top; /* Align content to top for longer texts */
+        }
+        .history-table th {
+            background-color: #e2e8f0;
+            font-weight: 600;
+            color: #1e3a8a;
+            white-space: nowrap; /* Prevent headers from wrapping */
+        }
+        .history-table tr:nth-child(even) {
+            background-color: #f1f5f9; /* Zebra striping */
+        }
+        .history-table tr:hover {
+            background-color: #e2e8f0; /* Hover effect */
+        }
+
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .container {
@@ -88,6 +121,10 @@
             .footer {
                 text-align: center;
                 padding-right: 1rem; /* Adjust padding for smaller screens */
+            }
+            .history-table th,
+            .history-table td {
+                padding: 0.5rem 0.75rem; /* Smaller padding on small screens */
             }
         }
     </style>
@@ -100,9 +137,8 @@
             <p>บริษัท อิมมอทัล พาร์ท จำกัด</p>
         </div>
 
-        <div class="history-content">
-            <p>หน้านี้จะแสดงประวัติคำขอใบเสนอราคาของคุณ</p>
-            <p>(*ยังไม่ได้เชื่อมต่อข้อมูลจริง)</p>
+        <div id="historyContent" class="history-content">
+            <p>กำลังโหลดข้อมูลประวัติ...</p>
         </div>
     </div>
 
@@ -117,18 +153,89 @@
 
     <script>
         const backToFormBtn = document.getElementById('backToFormBtn');
+        const historyContentDiv = document.getElementById('historyContent');
 
         backToFormBtn.addEventListener('click', () => {
-            // Check if google.script.run is available (for Apps Script deployment)
             if (typeof google !== 'undefined' && typeof google.script !== 'undefined' && typeof google.script.run !== 'undefined') {
                 google.script.run.withSuccessHandler(url => {
-                    window.location.href = url; // Redirect to the index.html page
-                }).getIndexPageUrl(); // This function needs to be defined in your Apps Script .gs file
+                    window.location.href = url;
+                }).getIndexPageUrl();
             } else {
-                // For local testing, just go back to index.html directly
                 window.location.href = 'index.html';
             }
         });
+
+        // Function to load and display history data
+        function loadHistoryData() {
+            historyContentDiv.innerHTML = '<p>กำลังโหลดข้อมูลประวัติ...</p>'; // Show loading message
+
+            if (typeof google === 'undefined' || typeof google.script === 'undefined' || typeof google.script.run === 'undefined') {
+                historyContentDiv.innerHTML = '<p class="text-red-600">ข้อผิดพลาด: ไม่สามารถเชื่อมต่อกับ Google Apps Script ได้ (<code>google.script.run</code> ไม่ถูกกำหนด). กรุณาตรวจสอบว่าคุณกำลังใช้งานหน้าเว็บนี้ผ่าน URL ที่ถูกต้องจากการ Deploy บน Google Apps Script.</p>';
+                return;
+            }
+
+            google.script.run
+                .withSuccessHandler(data => {
+                    displayHistoryData(data);
+                })
+                .withFailureHandler(error => {
+                    console.error("Error loading history data:", error);
+                    historyContentDiv.innerHTML = '<p class="text-red-600">เกิดข้อผิดพลาดในการดึงข้อมูลประวัติ: ' + error.message + '</p>';
+                })
+                .getQuotationHistoryData();
+        }
+
+        // Function to render data into a table
+        function displayHistoryData(data) {
+            historyContentDiv.innerHTML = ''; // Clear loading message
+
+            if (!data || data.length <= 1) { // data.length <= 1 means only headers or no data
+                historyContentDiv.innerHTML = '<p>ยังไม่มีประวัติคำขอใบเสนอราคา</p>';
+                return;
+            }
+
+            const headers = data[0]; // First row is headers
+            const rows = data.slice(1); // Remaining rows are data
+
+            const tableContainer = document.createElement('div');
+            tableContainer.classList.add('history-table-container');
+
+            const table = document.createElement('table');
+            table.classList.add('history-table', 'w-full', 'border', 'border-collapse');
+
+            // Create table header
+            const thead = table.createTHead();
+            const headerRow = thead.insertRow();
+            headers.forEach(headerText => {
+                const th = document.createElement('th');
+                th.textContent = headerText;
+                headerRow.appendChild(th);
+            });
+
+            // Create table body
+            const tbody = table.createTBody();
+            rows.forEach(rowData => {
+                const tr = tbody.insertRow();
+                rowData.forEach((cellData, index) => {
+                    const td = tr.insertCell();
+                    // Format timestamp if it's the first column (assuming index 0 is timestamp)
+                    if (index === 0 && cellData instanceof Date) {
+                        td.textContent = cellData.toLocaleString('th-TH', {
+                            year: 'numeric', month: 'short', day: 'numeric',
+                            hour: '2-digit', minute: '2-digit'
+                        });
+                    } else {
+                        td.textContent = cellData;
+                    }
+                });
+            });
+
+            tableContainer.appendChild(table);
+            historyContentDiv.appendChild(tableContainer);
+        }
+
+        // Load data when the page loads
+        document.addEventListener('DOMContentLoaded', loadHistoryData);
     </script>
 </body>
 </html>
