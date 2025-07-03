@@ -1,12 +1,12 @@
 // Google Sheet ID - already known by the script when attached to the sheet.
-const SPREADSHEET_ID = "1XaR3lny5ui8-jmvVN2v68S3HRe_RxwR0JYzJ0E3aCdA"; // Not strictly needed if script is bound
+const SPREADSHEET_ID = ""; // Not strictly needed if script is bound
 const SHEET_NAME = "QuotationRequest";
 
 // Telegram Bot Settings - ใส่ข้อมูลจากการสร้าง Bot
-const TELEGRAM_BOT_TOKEN = "7967646027:AAHti6Dd_mSGdta6XfArgwhzigzpt8f1DaQ"; // ได้จาก @BotFather
+const TELEGRAM_BOT_TOKEN = ""; // ได้จาก @BotFather
 const TELEGRAM_CHAT_IDS = [
-"7572101335", // Chat ID ของผู้ใช้ 1
-"-4971276512" // Chat ID ของกลุ่ม (เริ่มด้วย -)
+"", // Chat ID ของผู้ใช้ 1
+"" // Chat ID ของกลุ่ม (เริ่มด้วย -)
 // เพิ่ม Chat ID ได้ตามต้องการ
 ];
 
